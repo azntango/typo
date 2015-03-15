@@ -201,7 +201,7 @@ class Admin::ContentController < Admin::BaseController
         destroy_the_draft unless @article.draft
         set_article_categories
         set_the_flash
-        if params[:merge_submit]
+        if params[:merge_with] != "" || params[:merge_with] != nil
           merge(@article, params[:merge_with])
         end
         redirect_to :action => 'index'
