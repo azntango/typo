@@ -19,7 +19,7 @@ Background: Set up two articles
    And I am logged into the admin panel
    And I go to the new article page
    And I create an article with title "Totoro" and body "Best Movie Evar" 
-   And I create an article with title "Howl's Moving Castle" and body "Best Movie Evar" 
+   And I create an article with title "Howl's Moving Castle" and body "Best Movie Evar also" 
    Then I should be on the admin content page
    When I go to the home page
    Then I should see "Totoro"
@@ -27,32 +27,19 @@ Background: Set up two articles
 
 Scenario: Combine text of both articles
 When I follow "Totoro"
-And I enter 
-
-
-And I enter article id "2"
-And I click "Merge"
+And I fill in 'merge_id' with "2"
+And I click "Merge Articles"
 Then I should be on the merged article
-And I should see "Stuff from article 1"
-And I should see "Stuff from article 2"
+And I should see "Best Movie Evar"
+And I should see "Best Movie Evar also"
 
 Scenario: One author per merged article
-Given I am logged in as an admin
-And I go to edit an article
-And I enter article id "2"
-And I click "Merge"
-Then I should be on the merge article
-And I should see "Author from article 1"
-And I should not see "Author from article 2"
-
-Scenario: Keep comments in merged article
-Given I am logged in as an admin
-And I go to edit an article
-And I enter article id "2"
-And I click "Merge"
-Then I should be on the merge article
-And I should see "Comments from article 1"
-And I should see "Comments from article 2"
+When I follow "Totoro"
+And I fill in 'merge_id' with "2"
+And I click "Merge Articles"
+Then I should be on the merged article
+And I should see "Totoro"
+And I should not see "Howl's Moving Castle"
 
 Scenario: One title per merged article
 Given I am logged in as an admin
@@ -60,5 +47,4 @@ And I go to edit an article
 And I enter article id "2"
 And I click "Merge"
 Then I should be on the merge article
-And I should see "Title from article 1"
-And I should not see "Title from article 2"
+And I should see "admin"
