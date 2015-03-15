@@ -420,9 +420,8 @@ class Article < Content
     self.body += merge_article.body || ""
     self.extended += merge_article.extended || ""
     self.excerpt += merge_article.excerpt || ""
-    Comment.find_all_by_id(merge_id).each do |comment|
+    Comment.find_all_by_id(merge_id.to_i).each do |comment|
       comment.article_id = self.id
-      self.comments += comment
     end
     self.save
     merge_article.destroy
