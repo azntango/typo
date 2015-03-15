@@ -59,7 +59,7 @@ class Admin::ContentController < Admin::BaseController
     end
     unless @article.comments.nil? or merge_article.comments.nil? 
       merge_article.comments.each do |comment|
-        @article.body.comments << comment
+        @article.comments << comment
       end
     end
     @article.save!
