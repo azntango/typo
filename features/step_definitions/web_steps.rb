@@ -45,6 +45,7 @@ end
 
 And /^I am logged into the admin panel$/ do
   visit '/accounts/login'
+  page.should have_content('Login')
   fill_in 'user_login', :with => 'admin'
   fill_in 'user_password', :with => 'aaaaaaaa'
   click_button 'Login'

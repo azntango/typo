@@ -11,6 +11,65 @@ class Admin::ContentController < Admin::BaseController
     render :inline => "<%= raw auto_complete_result @items, 'name' %>"
   end
 
+  #Required so that exceptions are swallowed when finding an article
+  def get_article(id)
+    begin
+      article = Article.find(id)
+    rescue 
+      article = nil
+    end
+    return article
+  end
+
+  #Added method for merge functionality
+  #How this method works is taking 2nd article and editing the 1st article
+  #Then deleting the 2nd article
+  def merge
+    #params[:base_id] = base article_id we are keeping
+    #params[:merge_id] = merging article, discarding author and title
+    if not current_user.admin?
+      redirect_to :action => 'edit'
+      flash[:error] = "You are not an admin"
+      return
+    end
+
+    @article = get_article(params[:base_id])
+    if @article.nil?
+      redirect_to :action => 'index'
+      flash[:error] = "Invalid base article to merge on"
+      return
+    end
+
+    @merge_article = get_article(params[:merge_id])
+    if @merge_article.nil?
+      redirect_to :action => 'edit'
+      flash[:error] = "Invalid merge id provided"
+      return
+    end
+
+    #Merge logic
+    unless @article.body.nil? or @merge_article.body.nil?
+      @article.body = @article.body + @merge_article.body
+    end
+    unless @article.extended.nil? or @merge_article.extended.nil?
+      @article.extended = @article.extended + @merge_article.extended
+    end
+    unless @article.excerpt.nil? or @merge_article.excerpt.nil?
+      @article.excerpt = @article.excerpt + @merge_article.excerpt
+    end
+    unless @article.comments.nil? or @merge_article.comments.nil? 
+      @merge_article.comments.each do |comment|
+        @article.body.comments << comment
+      end
+    end
+    @article.save!
+    @merge_article.destroy
+
+    set_the_flash
+    new_or_edit
+
+  end
+
   def index
     @search = params[:search] ? params[:search] : {}
     
@@ -145,6 +204,12 @@ class Admin::ContentController < Admin::BaseController
     @article = Article.get_or_build_article(id)
     @article.text_filter = current_user.text_filter if current_user.simple_editor?
 
+    #redirect if merge button was pressed
+    if params[:merge_id] and params[:merge_submit] and request.post?
+      redirect_to :action => 'merge', :base_id => params[:id], :merge_id => params[:merge_id]
+      return
+    end
+
     @post_types = PostType.find(:all)
     if request.post?
       if params[:article][:draft]
@@ -189,6 +254,8 @@ class Admin::ContentController < Admin::BaseController
       flash[:notice] = _('Article was successfully created')
     when 'edit'
       flash[:notice] = _('Article was successfully updated.')
+    when 'merge'
+      flash[:notice] = _('Article was successfully merged')
     else
       raise "I don't know how to tidy up action: #{params[:action]}"
     end
