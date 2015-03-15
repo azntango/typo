@@ -26,38 +26,40 @@ class Admin::ContentController < Admin::BaseController
   #Then deleting the 2nd article
   def merge(base_id, merge_id)
     if not current_user.admin?
-      redirect_to :action => 'edit'
-      flash[:error] = "You are not an admin"
+      #flash[:error] = "You are not an admin"
+      #redirect_to :action => 'edit'
       return
     end
 
     @article = get_article(base_id)
     if @article.nil?
-      redirect_to :action => 'index'
-      flash[:error] = "Invalid base article to merge on"
+      #flash[:error] = "Invalid base article to merge on"
+      #redirect_to :action => 'index'
       return
     end
 
     merge_article = get_article(merge_id)
     if merge_article.nil?
-      redirect_to :action => 'edit'
-      flash[:error] = "Invalid merge id provided"
+      #flash[:error] = "Invalid merge id provided"
+      #redirect_to :action => 'edit'
       return
     end
 
     #Merge logic
-    @article.body = @article.body + merge_article.body
-    @article.extended = @article.extended + merge_article.extended
-    @article.excerpt = @article.excerpt + merge_article.excerpt 
-    merge_article.comments.each do |comment|
-      @article.comments << comment
+    begin
+      @article.body += merge_article.body || ""
+      @article.extended += merge_article.extended || ""
+      @article.excerpt += merge_article.excerpt || ""
+      merge_article.comments.each do |comment|
+        @article.comments << comment
+      end
+    rescue
+      flash[:error] = "Problem with merging!"
+      return
     end
 
     @article.save
     merge_article.destroy
-
-    set_the_flash
-    new_or_edit
 
   end
 
@@ -222,7 +224,9 @@ class Admin::ContentController < Admin::BaseController
         destroy_the_draft unless @article.draft
         set_article_categories
         set_the_flash
-        merge(params[:id], params[:merge_id])
+        if params[:merge_submit]
+          merge(params[:id], params[:merge_with])
+        end
         redirect_to :action => 'index'
         return
       end
@@ -241,7 +245,7 @@ class Admin::ContentController < Admin::BaseController
     when 'edit'
       flash[:notice] = _('Article was successfully updated.')
     when 'merge'
-      flash[:notice] = _('Article was successfully merged')
+      flash[:notice] = _(params)
     else
       raise "I don't know how to tidy up action: #{params[:action]}"
     end
