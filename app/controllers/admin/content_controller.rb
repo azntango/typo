@@ -24,43 +24,20 @@ class Admin::ContentController < Admin::BaseController
   #Added method for merge functionality
   #How this method works is taking 2nd article and editing the 1st article
   #Then deleting the 2nd article
-  def merge(base_id, merge_id)
+  def merge(article, merge_id)
     if not current_user.admin?
-      #flash[:error] = "You are not an admin"
+      flash[:error] = "You are not an admin"
       #redirect_to :action => 'edit'
-      return
-    end
-
-    @article = get_article(base_id)
-    if @article.nil?
-      #flash[:error] = "Invalid base article to merge on"
-      #redirect_to :action => 'index'
       return
     end
 
     merge_article = get_article(merge_id)
     if merge_article.nil?
-      #flash[:error] = "Invalid merge id provided"
+      flash[:error] = "Invalid merge id provided"
       #redirect_to :action => 'edit'
       return
-    end
-
-    #Merge logic
-    begin
-      @article.body += merge_article.body || ""
-      @article.extended += merge_article.extended || ""
-      @article.excerpt += merge_article.excerpt || ""
-      merge_article.comments.each do |comment|
-        @article.comments << comment
-      end
-    rescue
-      flash[:error] = "Problem with merging!"
-      return
-    end
-
-    @article.save
-    merge_article.destroy
-
+    end 
+    article.merge_with(merge_article, merge_id)
   end
 
   def index
@@ -225,7 +202,7 @@ class Admin::ContentController < Admin::BaseController
         set_article_categories
         set_the_flash
         if params[:merge_submit]
-          merge(params[:id], params[:merge_with])
+          merge(@article, params[:merge_with])
         end
         redirect_to :action => 'index'
         return
@@ -244,8 +221,6 @@ class Admin::ContentController < Admin::BaseController
       flash[:notice] = _('Article was successfully created')
     when 'edit'
       flash[:notice] = _('Article was successfully updated.')
-    when 'merge'
-      flash[:notice] = _(params)
     else
       raise "I don't know how to tidy up action: #{params[:action]}"
     end
