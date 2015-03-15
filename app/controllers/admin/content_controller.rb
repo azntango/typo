@@ -48,24 +48,17 @@ class Admin::ContentController < Admin::BaseController
     end
 
     #Merge logic
-    unless @article.body.nil? or merge_article.body.nil?
-      @article.body = @article.body + merge_article.body
-    end
-    unless @article.extended.nil? or merge_article.extended.nil?
-      @article.extended = @article.extended + merge_article.extended
-    end
-    unless @article.excerpt.nil? or merge_article.excerpt.nil?
-      @article.excerpt = @article.excerpt + merge_article.excerpt
-    end
-    unless @article.comments.nil? or merge_article.comments.nil? 
-      merge_article.comments.each do |comment|
-        @article.comments << comment
-      end
-    end
+    @article.body = @article.body + merge_article.body
+    @article.extended = @article.extended + merge_article.extended
+    @article.excerpt = @article.excerpt + merge_article.excerpt 
+    merge_article.comments.each do |comment|
+      @article.comments << comment
+
     @article.save!
 
-    merge_article = Article.find(params[:merge_id]) 
-    merge_article.destroy
+    merge_article.destroy!
+    # merge_article = Article.find(params[:merge_id]) 
+    # merge_article.destroy
 
     set_the_flash
     new_or_edit

@@ -19,6 +19,7 @@ Given the blog is set up
 And I am logged into the admin panel
 And I go to the new article page
 And I create an article with title "Totoro" and body "Best Movie Evar" 
+And I go to the new article page
 And I create an article with title "Howl's Moving Castle" and body "Best Movie Evar also" 
 Then I should be on the admin content page
 When I go to the home page
@@ -34,6 +35,7 @@ Given the blog is set up
 And I am logged into the admin panel
 And I go to the new article page
 And I create an article with title "Totoro" and body "Best Movie Evar" 
+And I go to the new article page
 And I create an article with title "Howl's Moving Castle" and body "Best Movie Evar also" 
 Then I should be on the admin content page
 When I go to the home page
@@ -49,6 +51,7 @@ Given the blog is set up
 And I am logged into the admin panel
 And I go to the new article page
 And I create an article with title "Totoro" and body "Best Movie Evar" 
+And I go to the new article page
 And I create an article with title "Howl's Moving Castle" and body "Best Movie Evar also" 
 Then I should be on the admin content page
 When I go to the home page
