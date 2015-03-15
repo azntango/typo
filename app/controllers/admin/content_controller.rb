@@ -205,8 +205,8 @@ class Admin::ContentController < Admin::BaseController
     @article.text_filter = current_user.text_filter if current_user.simple_editor?
 
     #redirect if merge button was pressed
-    if params[:merge_id] and params[:merge_submit] and request.post?
-      redirect_to :action => 'merge', :base_id => params[:id], :merge_id => params[:merge_id]
+    if params[:merge_with] and params[:merge_submit] and request.post?
+      redirect_to :action => 'merge', :base_id => params[:id], :merge_id => params[:merge_with]
       return
     end
 
