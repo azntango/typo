@@ -37,7 +37,7 @@ class Admin::ContentController < Admin::BaseController
       #redirect_to :action => 'edit'
       return
     end 
-    article.merge_with(merge_article)
+    article.merge_with(merge_article, merge_id)
   end
 
   def index
