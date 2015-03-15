@@ -24,23 +24,21 @@ class Admin::ContentController < Admin::BaseController
   #Added method for merge functionality
   #How this method works is taking 2nd article and editing the 1st article
   #Then deleting the 2nd article
-  def merge
-    #params[:base_id] = base article_id we are keeping
-    #params[:merge_id] = merging article, discarding author and title
+  def merge(base_id, merge_id)
     if not current_user.admin?
       redirect_to :action => 'edit'
       flash[:error] = "You are not an admin"
       return
     end
 
-    @article = get_article(params[:base_id])
+    @article = get_article(base_id)
     if @article.nil?
       redirect_to :action => 'index'
       flash[:error] = "Invalid base article to merge on"
       return
     end
 
-    merge_article = get_article(params[:merge_id])
+    merge_article = get_article(merge_id)
     if merge_article.nil?
       redirect_to :action => 'edit'
       flash[:error] = "Invalid merge id provided"
@@ -53,12 +51,10 @@ class Admin::ContentController < Admin::BaseController
     @article.excerpt = @article.excerpt + merge_article.excerpt 
     merge_article.comments.each do |comment|
       @article.comments << comment
+    end
 
-    @article.save!
-
-    merge_article.destroy!
-    # merge_article = Article.find(params[:merge_id]) 
-    # merge_article.destroy
+    @article.save
+    merge_article.destroy
 
     set_the_flash
     new_or_edit
@@ -199,12 +195,6 @@ class Admin::ContentController < Admin::BaseController
     @article = Article.get_or_build_article(id)
     @article.text_filter = current_user.text_filter if current_user.simple_editor?
 
-    #redirect if merge button was pressed
-    if params[:merge_with] and params[:merge_submit] and request.post?
-      redirect_to :action => 'merge', :base_id => params[:id], :merge_id => params[:merge_with]
-      return
-    end
-
     @post_types = PostType.find(:all)
     if request.post?
       if params[:article][:draft]
@@ -232,6 +222,7 @@ class Admin::ContentController < Admin::BaseController
         destroy_the_draft unless @article.draft
         set_article_categories
         set_the_flash
+        merge(params[:id], params[:merge_id])
         redirect_to :action => 'index'
         return
       end
