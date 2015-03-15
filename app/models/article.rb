@@ -422,6 +422,7 @@ class Article < Content
     self.excerpt += merge_article.excerpt || ""
     Comment.find_all_by_article_id(merge_id.to_i).each do |comment|
       comment.article_id = self.id
+      comment.save
     end
 
     self.save

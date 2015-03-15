@@ -26,14 +26,14 @@ class Admin::ContentController < Admin::BaseController
   #Then deleting the 2nd article
   def merge(article, merge_id)
     if not current_user.admin?
-      flash[:error] = "You are not an admin"
+      #flash[:error] = "You are not an admin"
       #redirect_to :action => 'edit'
       return
     end
 
     merge_article = get_article(merge_id.to_i)
     if merge_article.nil?
-      flash[:error] = "Invalid merge id provided"
+      #flash[:error] = "Invalid merge id provided"
       #redirect_to :action => 'edit'
       return
     end 
