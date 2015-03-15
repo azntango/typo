@@ -31,7 +31,7 @@ class Admin::ContentController < Admin::BaseController
       return
     end
 
-    merge_article = get_article(merge_id)
+    merge_article = get_article(merge_id.to_i)
     if merge_article.nil?
       flash[:error] = "Invalid merge id provided"
       #redirect_to :action => 'edit'
